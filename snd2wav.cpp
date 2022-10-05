@@ -66,30 +66,36 @@ headerWAV.nAvgBytesPerSec = headerWAV.nSamplesPerSec*2*headerWAV.nChannels ;
 headerWAV.wBitsPerSample = 16;
 headerWAV.nBlockAlign = headerWAV.wBitsPerSample*headerWAV.nChannels / 8;
 strcpy(headerWAV.ckID3,"data");
-headerWAV.cksize3 = headerWAV.nBlockAlign*(size-42)/2;
+int num_samples = (size - 42) / headerWAV.nBlockAlign;
+headerWAV.cksize3 = 2 * headerWAV.nChannels * num_samples;
 
 //cout<<headerWAV.WAVEID<<"  "<< sizeof(headerWAV.WAVEID)<<endl;
 //cout<<headerWAV.ckID2<<endl;
-//cout<<headerWAV.wFormatTag<<endl;
-//cout<<headerWAV.nChannels<<endl;
-//cout<<headerWAV.nSamplesPerSec<<endl;
-//cout<<headerWAV.nAvgBytesPerSec<<" "<< sizeof(headerWAV.nAvgBytesPerSec)<< endl;
+//cout<< "wFormatTag="<<(int)headerWAV.wFormatTag << endl;
+//cout<< "Channels: " << (int)headerWAV.nChannels << endl;
+//cout<< (int)headerWAV.nSamplesPerSec<<endl;
+//cout<< (int)headerWAV.nAvgBytesPerSec<<" "<< sizeof(headerWAV.nAvgBytesPerSec)<< endl;
 //cout<<"nBlockAlign=" <<headerWAV.nBlockAlign<<endl;
-//cout<<headerWAV.wBitsPerSample<<endl;
+//cout<< (int)headerWAV.wBitsPerSample<<endl;
 //cout<<headerWAV.ckID3<<endl;
-//cout<<"cksize3="<<headerWAV.cksize3<<endl;
+//cout<<"cksize3="<<(int)headerWAV.cksize3<<endl;
+//cout << "HeaderSize=" << size - (int)headerWAV.cksize3 << endl;
 
 //read sample data into vector####
-vector <short> data; 
-for (int i = 42; i < size ; i+=2) // i+=2
+vector <short> ldata; 
+vector <short> rdata;
+for (int i = 42; i < size; i+=2) // i+=2
 	{
-	uint16_t smpl = bytes2Short(buf[i], buf[i + 1]);
-    data.push_back(smpl);
-	}
-
+	uint16_t smpl1 = bytes2Short(buf[i], buf[i+1]);
+    ldata.push_back(smpl1);
+    if (headerWAV.nChannels==2)
+        {
+        uint16_t smpl2 = bytes2Short(buf[i], buf[i+1]);
+        rdata.push_back(smpl2);
+        }
+    }
 //create wav file with same name
 string filename = ptr;
-
 // Remove extension if present.
 const size_t period_idx = filename.rfind('.');
 if (std::string::npos != period_idx)
@@ -100,7 +106,6 @@ if (std::string::npos != period_idx)
 filename=filename.append(".wav");
 cout << filename << endl;
 const char* ofileNameSND = filename.c_str();
-
 //write to file
 FILE* outfile = fopen(ofileNameSND, "wb");
 if (outfile == NULL)
@@ -120,18 +125,29 @@ fwrite(&headerWAV.wBitsPerSample,sizeof(headerWAV.wBitsPerSample),1,outfile);
 fwrite(&headerWAV.ckID3,sizeof(headerWAV.ckID3),1,outfile);
 fwrite(&headerWAV.cksize3,sizeof(headerWAV.cksize3),1,outfile);
 
-for (int i = 0; i < data.size(); i++)
+//if mono..
+int length = ldata.size();
+//if stereo..
+if (headerWAV.nChannels == 2) length /= 2;
+
+//write Data to File
+int j = 0;
+for (int i = 0; i < length; i++)
     {
-     short &samplebuffer = data[i];
+     short &samplebuffer = ldata[i];
      fwrite(&samplebuffer,sizeof(samplebuffer),1,outfile); 
-    }
+
+    if (headerWAV.nChannels == 2)
+         {
+         short& samplebuffer2 = rdata[j + ldata.size()/2];
+         fwrite(&samplebuffer2, sizeof(samplebuffer2), 1, outfile);
+         j++;
+         }
+     }
 
 fclose(outfile);
-
 delete[] buf;
-
 std::cout << "File converted to wav " << filename << endl;
-
 return 0; 
 }
 
