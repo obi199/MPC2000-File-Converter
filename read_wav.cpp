@@ -50,7 +50,7 @@ ptr = argv[1];
 ifstream sndFile(ptr, ios::in | ios::binary);
 if (!sndFile.is_open())
 {
-    cerr << "Fehler beim Öffnen der Datei" << endl;
+    cerr << "Fehler beim Ã–ffnen der Datei" << endl;
     exit(1);
 }
 sndFile.read(buf, bufSize);
@@ -90,7 +90,7 @@ cout<<"nBlockAlign="<<headerWAV.nBlockAlign<<endl;
 cout<<"wBitsPerSample="<<headerWAV.wBitsPerSample<<endl;
 cout<<"ckID3="<<headerWAV.ckID3<<endl;
 cout<<"cksize3="<<headerWAV.cksize3<<endl;
-
+cout<<"HeaderSize="<<size - headerWAV.cksize3<<endl;
 if (headerWAV.wFormatTag != 1)
     {
     cerr << "Error: not a pcm type"<<endl;
