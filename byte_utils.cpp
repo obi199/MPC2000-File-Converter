@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <algorithm>
 using namespace std;
 typedef uint32_t u_int32_t;
 typedef uint16_t u_int16_t;
