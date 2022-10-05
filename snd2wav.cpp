@@ -66,7 +66,7 @@ headerWAV.nAvgBytesPerSec = headerWAV.nSamplesPerSec*2*headerWAV.nChannels ;
 headerWAV.wBitsPerSample = 16;
 headerWAV.nBlockAlign = headerWAV.wBitsPerSample*headerWAV.nChannels / 8;
 strcpy(headerWAV.ckID3,"data");
-headerWAV.cksize3 = size-42;
+headerWAV.cksize3 = headerWAV.nBlockAlign*(size-42)/2;
 
 //cout<<headerWAV.WAVEID<<"  "<< sizeof(headerWAV.WAVEID)<<endl;
 //cout<<headerWAV.ckID2<<endl;
@@ -74,10 +74,10 @@ headerWAV.cksize3 = size-42;
 //cout<<headerWAV.nChannels<<endl;
 //cout<<headerWAV.nSamplesPerSec<<endl;
 //cout<<headerWAV.nAvgBytesPerSec<<" "<< sizeof(headerWAV.nAvgBytesPerSec)<< endl;
-//cout<<headerWAV.nBlockAlign<<endl;
+//cout<<"nBlockAlign=" <<headerWAV.nBlockAlign<<endl;
 //cout<<headerWAV.wBitsPerSample<<endl;
 //cout<<headerWAV.ckID3<<endl;
-//cout<<headerWAV.cksize3<<endl;
+//cout<<"cksize3="<<headerWAV.cksize3<<endl;
 
 //read sample data into vector####
 vector <short> data; 
