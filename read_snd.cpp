@@ -84,12 +84,12 @@ cout<<"Name="<<name<<endl;
 cout<<"space="<<headerSND.pad<<endl;
 cout<<"Level="<<(int)headerSND.level<<endl;
 cout<<"Tune="<<(int)headerSND.tune<<endl;
-cout<<"Channels="<<headerSND.channels<<endl;
-cout<<"Start="<<headerSND.start<<endl;
-cout<<"loopend="<<headerSND.loopend<<endl;
-cout<<"end="<<headerSND.end<<endl;
-cout<<"looplength="<<headerSND.looplength<<endl;
-cout<<"loopmode="<<headerSND.loopmode<<endl;
+cout<<"Channels="<< (int)headerSND.channels<<endl;
+cout<<"Start="<< (int)headerSND.start<<endl;
+cout<<"loopend="<< (int)headerSND.loopend<<endl;
+cout<<"end="<< (int)headerSND.end<<endl;
+cout<<"looplength="<< (int)headerSND.looplength<<endl;
+cout<<"loopmode="<< (int)headerSND.loopmode<<endl;
 cout<<"beatsinloop="<<(int)headerSND.beatsinloop<<endl;
 
 cout<<"Frequency="<<headerSND.sample_frequency<<"	"<<"sizeOf "<< sizeof(headerSND.sample_frequency)<<endl;
@@ -102,7 +102,7 @@ for (int i = 42; i < size ; i+=2) // i+=2
 	data.push_back(smpl);
 	}
 
-cout << data.size()<<endl;
+cout <<"datasize = "<< data.size() << endl;
 
 // signed short smpl = bytes2Short2(buf[42], buf[43]);
 //for (int i = 0; i < data.size(); i++) {// i+=2

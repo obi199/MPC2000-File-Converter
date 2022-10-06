@@ -67,19 +67,19 @@ headerWAV.wBitsPerSample = bytes2unsignedShort(buf[34], buf[35]);
 headerWAV.cksize3 = bytes_2_u_int32(buf[40], buf[41], buf[42],buf[43]);
 unsigned short samplerate = bytes2unsignedShort(buf[24], buf[25]);
 
-// cout<<"ckID="<<headerWAV.ckID<<endl;
- cout<<"cksize="<<headerWAV.cksize<<endl;
-// cout<<"WAVEID="<<headerWAV.WAVEID<<endl;
-// cout<<"ckID2="<<headerWAV.ckID2<<endl;
-// cout<<"cksize2="<<headerWAV.cksize2<<endl;
-cout<<"wFormatTag="<<headerWAV.wFormatTag<<endl;
-cout<<"nChannels="<<headerWAV.nChannels<<endl;
-cout<<"nSamplesPerSec="<<headerWAV.nSamplesPerSec<<endl;
-cout<<"nAvgBytesPerSec="<<headerWAV.nAvgBytesPerSec<<endl;
-cout<<"nBlockAlign="<<headerWAV.nBlockAlign<<endl;
-cout<<"wBitsPerSample="<<headerWAV.wBitsPerSample<<endl;
-cout<<"ckID3="<<headerWAV.ckID3<<endl;
-cout<<"cksize3="<<headerWAV.cksize3<<endl;
+//// cout<<"ckID="<<headerWAV.ckID<<endl;
+// cout<<"cksize="<<headerWAV.cksize<<endl;
+//// cout<<"WAVEID="<<headerWAV.WAVEID<<endl;
+//// cout<<"ckID2="<<headerWAV.ckID2<<endl;
+//// cout<<"cksize2="<<headerWAV.cksize2<<endl;
+//cout<<"wFormatTag="<<headerWAV.wFormatTag<<endl;
+//cout<<"nChannels="<<headerWAV.nChannels<<endl;
+//cout<<"nSamplesPerSec="<<headerWAV.nSamplesPerSec<<endl;
+//cout<<"nAvgBytesPerSec="<<headerWAV.nAvgBytesPerSec<<endl;
+//cout<<"nBlockAlign="<<headerWAV.nBlockAlign<<endl;
+//cout<<"wBitsPerSample="<<headerWAV.wBitsPerSample<<endl;
+//cout<<"ckID3="<<headerWAV.ckID3<<endl;
+//cout<<"cksize3="<<headerWAV.cksize3<<endl;
 
 //read sample data into vector
 if (headerWAV.wFormatTag != 1)
@@ -89,15 +89,21 @@ if (headerWAV.wFormatTag != 1)
         }
 
 long num_samples = (8 * headerWAV.cksize3) / (headerWAV.nChannels * headerWAV.wBitsPerSample);
-cout << num_samples << endl;
+//int num_samples = (size - 44) / headerWAV.nBlockAlign;
+cout <<"num_samples = "<<num_samples << endl;
 
-vector <short> data;
+vector <short> ldata;
+vector <short> rdata;
 for (int i = 44; i < size; i += 2) // i+=2
 {
     uint16_t smpl = bytes2Short(buf[i], buf[i + 1]);
-    data.push_back(smpl);
+    ldata.push_back(smpl);
+    if (headerWAV.nChannels == 2)
+    {
+        uint16_t smpl2 = bytes2Short(buf[i], buf[i + 1]);
+        rdata.push_back(smpl2);
+    }
 }
-cout << data.size() << endl;
 
 //create SND Filename
 string filename = ptr;
@@ -120,11 +126,7 @@ filename = remove_spaces(filename);
 
 if (filename.length() > 8) filename = filename.substr(0, 8);
 
-
-cout << filename << endl;
-
 const char* sfilename = filename.c_str();
-
 //create SND Header
 headerSND.chk1 = 1;
 headerSND.chk2 = 4;
@@ -140,7 +142,6 @@ headerSND.looplength = 0;
 headerSND.loopmode = 0; 
 headerSND.beatsinloop = 1;
 headerSND.sample_frequency = samplerate; 
-
 
 cout << filename << endl;
 cout << opath << endl;
@@ -166,14 +167,36 @@ fwrite(&headerSND.loopmode,sizeof(headerSND.loopmode),1,outfile);
 fwrite(&headerSND.beatsinloop,sizeof(headerSND.beatsinloop),1,outfile);
 fwrite(&headerSND.sample_frequency,sizeof(headerSND.sample_frequency),1,outfile);
 
-for (int i = 0; i < num_samples; i++)
+//for (int i = 0; i < num_samples; i++)
+//{
+//    short& samplebuffer = data[i];
+//    fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
+//}
+
+int length = ldata.size();
+//cout << "length = " << length;
+//if mono..
+if (headerWAV.nChannels == 1)
 {
-    short& samplebuffer = data[i];
+    for (int i = 0; i < length; i++) {
+        short& samplebuffer = ldata[i];
+        fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
+    }
+}
+//if stereo..
+if (headerWAV.nChannels == 2){
+    for (int i = 0; i < length; i+=2){
+    short& samplebuffer = ldata[i];
     fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
+    }
+
+    for (int i = 1 ; i < length; i+=2){
+    short& samplebuffer2 = rdata[i];
+    fwrite(&samplebuffer2, sizeof(samplebuffer2), 1, outfile);
+    }
 }
 
 fclose(outfile);
-
 delete[] buf;
 return 0; 
 

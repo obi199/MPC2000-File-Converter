@@ -105,7 +105,7 @@ for (int i = 44; i < size; i+=2) // i+=2
 	}
 
 cout << data.size()<<endl;
-for (int i = 0; i <= 120 ; i++)
+for (int i = 0; i <= 10 ; i++)
 	cout << data[i] << endl;
 
 delete[] buf;
