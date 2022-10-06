@@ -1,5 +1,5 @@
 # MPC2000-File-Converter
 
-Converts wav files from 16bit 44100 Hz MONO to SND Akai Format and back from MONO SND to wav. 
-Use Cmake or compile wav2snd and snd2wav source files. 
-works for MPC 2000. 
+Converts wave files from 16bit 44100 Hz Mono or Stereo to SND Akai 2000 format or from SND to wav. 
+Use Cmake to compile wav2snd and snd2wav source files. 
+tested with MPC 2000. 
