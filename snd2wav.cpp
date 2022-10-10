@@ -20,8 +20,8 @@ struct HEADER_SND headerSND;
 
 int main(int argc, char *argv[])
 {
-//cout << is_big_endian() << endl;
-// 
+cout << "Copyright (C) 2022 obi199" << endl;
+
 //open wav file and read headerWAV
 if ( argc !=2 )
     {
@@ -38,7 +38,7 @@ fseek(infile, 0, SEEK_END);
 size = ftell(infile);
 fseek(infile, 0, SEEK_SET);
 const size_t bufSize = size ;
-cout<<bufSize<<endl;
+
 fclose(infile);
 char* buf = new char[bufSize];
 
@@ -104,7 +104,7 @@ if (std::string::npos != period_idx)
 }
 
 filename=filename.append(".wav");
-cout << filename << endl;
+
 const char* ofileNameSND = filename.c_str();
 //write to file
 FILE* outfile = fopen(ofileNameSND, "wb");
@@ -147,7 +147,7 @@ for (int i = 0; i < length; i++)
 
 fclose(outfile);
 delete[] buf;
-std::cout << "File converted to wav " << filename << endl;
+std::cout << "File converted to: " << filename << endl;
 return 0; 
 }
 

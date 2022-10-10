@@ -21,6 +21,7 @@ struct HEADER_SND headerSND;
 int main(int argc, char *argv[])
 {
 //open wav file and read headerWAV
+cout << "Copyright (C) 2022 obi199" << endl;
 if ( argc !=2 )
     {
         cerr << "no filemane declared"<<endl;
@@ -50,7 +51,7 @@ if (!sndFile.is_open())
        } 
 sndFile.read(buf, bufSize);
 sndFile.close();
-cout<<size<<endl;
+
 
 // headerWAV.ckID = getText(buf, 0, 4);
 headerWAV.cksize = bytes_2_u_int32(buf[4], buf[5], buf[6],buf[7]);
@@ -90,7 +91,6 @@ if (headerWAV.wFormatTag != 1)
 
 long num_samples = (8 * headerWAV.cksize3) / (headerWAV.nChannels * headerWAV.wBitsPerSample);
 //int num_samples = (size - 44) / headerWAV.nBlockAlign;
-cout <<"num_samples = "<<num_samples << endl;
 
 vector <short> ldata;
 vector <short> rdata;
@@ -143,8 +143,6 @@ headerSND.loopmode = 0;
 headerSND.beatsinloop = 1;
 headerSND.sample_frequency = samplerate; 
 
-cout << filename << endl;
-cout << opath << endl;
 filename.append(".SND");
 filename = opath + filename;
 const char* ofileNameSND = filename.c_str();
@@ -167,14 +165,8 @@ fwrite(&headerSND.loopmode,sizeof(headerSND.loopmode),1,outfile);
 fwrite(&headerSND.beatsinloop,sizeof(headerSND.beatsinloop),1,outfile);
 fwrite(&headerSND.sample_frequency,sizeof(headerSND.sample_frequency),1,outfile);
 
-//for (int i = 0; i < num_samples; i++)
-//{
-//    short& samplebuffer = data[i];
-//    fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
-//}
-
 int length = ldata.size();
-//cout << "length = " << length;
+
 //if mono..
 if (headerWAV.nChannels == 1)
 {
@@ -198,6 +190,7 @@ if (headerWAV.nChannels == 2){
 
 fclose(outfile);
 delete[] buf;
+std::cout << "File converted to: " << filename << endl;
 return 0; 
 
 }
