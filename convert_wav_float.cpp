@@ -1,4 +1,4 @@
-//WIP: trying to convert 32 bit Float 96Khz wav to 441Khz
+//Work in Progress: trying to convert 32 bit Float 96Khz wav to 441Khz
 
 #include "wav.h"
 #include "snd.h"
