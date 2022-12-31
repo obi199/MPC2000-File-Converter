@@ -12,7 +12,7 @@
 
 using namespace std;
 
-static void read_write_file (const char * fname)
+string read_write_file (const char * fname)
 {
 	SndfileHandle file, file2;
 	SRC_DATA src_data;
@@ -62,6 +62,7 @@ static void read_write_file (const char * fname)
 	delete[] buffer_out;
 	delete[] buffer;
 
+	return fname2;
 } 
 
 int main(int argc, char *argv[])
@@ -75,14 +76,18 @@ int main(int argc, char *argv[])
 	}
 	
 	if (argv[1] == std::string("-f"))
-	{
-		for (auto const& dir_entry : std::filesystem::directory_iterator{ std::filesystem::current_path() })
+	{	
+		string newpath = "16bit";
+		std::filesystem::path p = std::filesystem::current_path();
+		std::filesystem::create_directories(newpath);
+		for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
 		{
 			if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
 			{
 				filename = dir_entry.path().filename().string();
 				const char* fname = filename.c_str();
-				read_write_file(fname);
+				string fname2 = read_write_file(fname);
+				std::filesystem::rename(p / fname2, p / newpath / fname2);
 			}
 		}
 	}
@@ -91,7 +96,7 @@ int main(int argc, char *argv[])
 		const char* fname = argv[1];
 		auto const& dir_entry = std::filesystem::directory_entry{ fname };
 		if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) read_write_file(fname);
-		else std::cout << "\nError: File not existing or not a .wav file\n";
+		else std::cout << "\nError: File not existing or not a wave file\n";
 		}
 	return 0;
 } 
