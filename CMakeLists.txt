@@ -9,7 +9,7 @@ add_executable(wav2snd wav2snd.cpp)
 #add_executable(read_snd "read_snd.cpp")
 #add_executable(read_wav "read_wav_pcm_16bit.cpp")
 
-add_executable(converter_16bit converter_16bit.cpp)
+add_executable(converter_16bit "converter_wav_16bit.cpp")
 #link_directories("${CMAKE_CURRENT_SOURCE_DIR}\\lib\\ libsndfile-1.lib")
 
 target_link_libraries(converter_16bit "${CMAKE_CURRENT_SOURCE_DIR}\\lib\\sndfile.lib")
