@@ -12,7 +12,7 @@
 
 using namespace std;
 
-string read_write_file (const char * fname)
+static string read_write_file (const char * fname)
 {
 	SndfileHandle file, file2;
 	SRC_DATA src_data;
@@ -30,6 +30,8 @@ string read_write_file (const char * fname)
 	float* buffer = new float [frames];
 	float* buffer_out = new float[frames];
 
+	if (numChannels < 1)	return "error";
+
 	file.read (buffer, numFrames*numChannels);
 
 	double ratio = (double)44100 / (double)file.samplerate();
@@ -43,12 +45,12 @@ string read_write_file (const char * fname)
 	int error = src_simple(&src_data, SRC_SINC_BEST_QUALITY, numChannels);
 	if (error != 0) {
 		std::cerr << "Error occured: "  <<src_strerror(error) << endl;
-		exit(0);
+		return "error";
 	}
+
 	int channels = numChannels;
 	int format = SF_FORMAT_WAV | SF_FORMAT_PCM_16; //SF_FORMAT_FLOAT SF_FORMAT_PCM_16
 	int srate = 44100 ;
-
 
 	string newFilename = fname;
 	const char* fname2 = fname; 
@@ -87,7 +89,7 @@ int main(int argc, char *argv[])
 				filename = dir_entry.path().filename().string();
 				const char* fname = filename.c_str();
 				string fname2 = read_write_file(fname);
-				std::filesystem::rename(p / fname2, p / newpath / fname2);
+				if(fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
 			}
 		}
 	}
