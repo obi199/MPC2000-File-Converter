@@ -1,6 +1,6 @@
 //reads 16 Bit wav to stream
-#include "wav.h"
-#include "snd.h"
+#include "include/wav.h"
+#include "include/snd.h"
 #include "byte_utils.cpp"
 #include <iostream>
 #include <cstdio>//

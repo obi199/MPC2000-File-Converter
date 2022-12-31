@@ -4,7 +4,7 @@
 #include<string>
 #include <vector>
 #include "byte_utils.cpp"
-#include "snd.h"
+#include "include/snd.h"
 #include <fstream>
 #include <cstdlib>
 using namespace std;

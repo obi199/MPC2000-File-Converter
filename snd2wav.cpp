@@ -1,10 +1,10 @@
 //converts 16 Bit SND 44100hz to 16bit WAV File Format
 
-#include "wav.h"
-#include "snd.h"
+#include "include/wav.h"
+#include "include/snd.h"
 #include "byte_utils.cpp"
 #include <iostream>
-#include <cstdio>//
+#include <cstdio>
 #include <string>
 #include <vector>
 #include <stdint.h>

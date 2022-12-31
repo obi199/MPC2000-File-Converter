@@ -7,8 +7,8 @@
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
-#include "include\sndfile.hh"
-#include "include\samplerate.h"
+#include "include/sndfile.hh"
+#include "include/samplerate.h"
 
 using namespace std;
 
