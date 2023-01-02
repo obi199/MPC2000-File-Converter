@@ -5,6 +5,7 @@ To convert any wave files to 16bit 44100hz use "convert_16bit". Go to the path w
 For the 16bit wav conversion you need to install libsndfile and libsamplerate libs: https://github.com/libsndfile. <br/>
 For SND conversion type: "wav2snd pathToFile" "snd2wav pathToFile". Tested with MPC 2000. <br/> 
 Files can be compiled with Cmake:  wav2snd.cpp, snd2wav.cpp,  convert_16bit.cpp source files. <br/>
+Tested on Windows.
 
 
 
