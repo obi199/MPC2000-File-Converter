@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <cctype>
+#include <filesystem>
 using namespace std;
 FILE    *infile, *outfile;
 char    *buffer;
@@ -18,21 +19,21 @@ long    numbytes;
 struct HEADER_WAV headerWAV;
 struct HEADER_SND headerSND;
 
-int main(int argc, char *argv[])
+static string wav2snd (const char* fname)
 {
 //open wav file and read headerWAV
-cout << "Copyright (C) 2022 obi199" << endl;
-if ( argc !=2 )
-    {
-        cerr << "no filemane declared"<<endl;
-        return 1;
-    }	
+//cout << "Copyright (C) 2022 obi199" << endl;
+//if ( argc !=2 )
+//    {
+//        cerr << "no filemane declared"<<endl;
+//        return 1;
+//    }	
 /* open an file for reading */
-FILE* infile = fopen(argv[1], "r"); 
-
+//FILE* infile = fopen(argv[1], "r"); 
+FILE* infile = fopen(fname, "r");
 /* quit if the file does not exist */
 if(infile == NULL)
-    return 1;
+    return "Error";
 uint32_t size;
 fseek(infile, 0, SEEK_END);
 size = ftell(infile);
@@ -41,8 +42,8 @@ const size_t bufSize = size;
 char* buf = new char[bufSize];
 fclose(infile);
 
-char* ptr;
-ptr = argv[1];
+const char* ptr;
+ptr = fname;
 ifstream sndFile (ptr, ios::in | ios::binary);
 if (!sndFile.is_open())
        {
@@ -86,7 +87,7 @@ unsigned short samplerate = bytes2unsignedShort(buf[24], buf[25]);
 if (headerWAV.wFormatTag != 1)
         {
         cerr << "Error: not a pcm type"<<endl;
-        return 1;
+        return "Error";
         }
 
 long num_samples = (8 * headerWAV.cksize3) / (headerWAV.nChannels * headerWAV.wBitsPerSample);
@@ -148,7 +149,7 @@ filename = opath + filename;
 const char* ofileNameSND = filename.c_str();
 FILE* outfile = fopen(ofileNameSND, "wb");
 if (outfile == NULL)
-    return 1;
+    return "Error";
 fseek(outfile, 0, SEEK_SET);
 fwrite(&headerSND.chk1,sizeof(headerSND.chk1),1,outfile);
 fwrite(&headerSND.chk2,sizeof(headerSND.chk2),1,outfile);
@@ -191,6 +192,47 @@ if (headerWAV.nChannels == 2){
 fclose(outfile);
 delete[] buf;
 std::cout << "File converted to: " << filename << endl;
-return 0; 
+return filename;
 
+}
+
+
+
+int main(int argc, char* argv[])
+{
+    //open wav file and read headerWAV
+    cout << "Copyright (C) 2022 obi199" << endl;
+    if (argc != 2)
+    {
+        cerr << "no filemane declared" << endl;
+        return 1;
+    }
+
+    if (argv[1] == std::string("-f"))
+    {
+        string newpath = "snd";
+        string filename;
+
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
+            {
+                filename = dir_entry.path().filename().string();
+                const char* fname = filename.c_str();
+                string fname2 = wav2snd(fname);
+                if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+            }
+        }
+    }
+
+    else
+    {
+        const char* fname = argv[1];
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) wav2snd(fname);
+        else std::cout << "\nError: File not existing or not a wave file\n";
+    }
+    return 0;
 }
