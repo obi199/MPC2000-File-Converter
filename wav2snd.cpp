@@ -21,15 +21,7 @@ struct HEADER_SND headerSND;
 
 static string wav2snd (const char* fname)
 {
-//open wav file and read headerWAV
-//cout << "Copyright (C) 2022 obi199" << endl;
-//if ( argc !=2 )
-//    {
-//        cerr << "no filemane declared"<<endl;
-//        return 1;
-//    }	
-/* open an file for reading */
-//FILE* infile = fopen(argv[1], "r"); 
+
 FILE* infile = fopen(fname, "r");
 /* quit if the file does not exist */
 if(infile == NULL)
@@ -222,7 +214,7 @@ int main(int argc, char* argv[])
                 filename = dir_entry.path().filename().string();
                 const char* fname = filename.c_str();
                 string fname2 = wav2snd(fname);
-                if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+                if (fname2 != "Error") std::filesystem::rename(p / fname2, p / newpath / fname2);
             }
         }
     }

@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 FILE    *infile, *outfile;
@@ -18,32 +19,22 @@ long    numbytes;
 struct HEADER_WAV headerWAV;
 struct HEADER_SND headerSND;
 
-int main(int argc, char *argv[])
+static string snd2wav(const char* fname)
 {
-cout << "Copyright (C) 2022 obi199" << endl;
-
-//open wav file and read headerWAV
-if ( argc !=2 )
-    {
-        cerr << "no filemane declared"<<endl;
-        return 1;
-    }	
-/* open an existing file for reading */
-FILE* infile = fopen(argv[1], "r"); 
-
+FILE* infile = fopen(fname, "r");
+/* quit if the file does not exist */
 if(infile == NULL)
-    return 1;
+    return "Error";
 uint32_t size;
 fseek(infile, 0, SEEK_END);
 size = ftell(infile);
 fseek(infile, 0, SEEK_SET);
 const size_t bufSize = size ;
-
 fclose(infile);
-char* buf = new char[bufSize];
 
-char* ptr;
-ptr = argv[1];
+char* buf = new char[bufSize];
+const char* ptr;
+ptr = fname;
 ifstream sndFile (ptr, ios::in | ios::binary);
 if (!sndFile.is_open())
        {
@@ -52,7 +43,6 @@ if (!sndFile.is_open())
        } 
 sndFile.read(buf, bufSize);
 sndFile.close();
-
 //###create header###
 strcpy(headerWAV.ckID,"RIFF");
 headerWAV.cksize = size;
@@ -109,7 +99,7 @@ const char* ofileNameSND = filename.c_str();
 //write to file
 FILE* outfile = fopen(ofileNameSND, "wb");
 if (outfile == NULL)
-    return 1;
+    return "Error";
 fseek(outfile, 0, SEEK_SET);
 fwrite(&headerWAV.ckID,sizeof(headerWAV.ckID),1,outfile);
 fwrite(&headerWAV.cksize,sizeof(headerWAV.cksize),1,outfile);
@@ -148,6 +138,45 @@ for (int i = 0; i < length; i++)
 fclose(outfile);
 delete[] buf;
 std::cout << "File converted to: " << filename << endl;
-return 0; 
+return filename;
 }
 
+
+int main(int argc, char* argv[])
+{
+    //open wav file and read headerWAV
+    cout << "Copyright (C) 2022 obi199" << endl;
+    if (argc != 2)
+    {
+        cerr << "no filemane declared" << endl;
+        return 1;
+    }
+
+    if (argv[1] == std::string("-f"))
+    {
+        string newpath = "wav";
+        string filename;
+
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".SND"))
+            {
+                filename = dir_entry.path().filename().string();
+                const char* fname = filename.c_str();
+                string fname2 = snd2wav(fname);
+                if (fname2 != "Error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+            }
+        }
+    }
+
+    else
+    {
+        const char* fname = argv[1];
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".SND")) snd2wav(fname);
+        else std::cout << "\nError: File not existing or not a SND file\n";
+    }
+    return 0;
+}
