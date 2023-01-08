@@ -3,7 +3,7 @@
 Command Line Tool that converts 16bit 44100 Hz wave file (Mono/Stereo) to 16bit SND (MPC 2000) file or back. <br/>
 To convert any wave files to 16bit 44100hz use "convert_16bit". Go to the path with files and use either the filename as argument or -f  for all files in folder. It adds 16bit_441Mhz to the newly created filenames and copies them in folder "16bit". <br/> 
 For the 16bit wav conversion you need to install libsndfile and libsamplerate libs: https://github.com/libsndfile. <br/>
-For SND conversion type: "wav2snd pathToFile" "snd2wav pathToFile" or for all files in folder "-f". Tested with MPC 2000. <br/> 
+For SND conversion use: "wav2snd pathToFile" "snd2wav pathToFile" or for all files in folder "-f". Tested with MPC 2000. <br/> 
 Files can be compiled with Cmake:  wav2snd.cpp, snd2wav.cpp,  convert_16bit.cpp source files. <br/>
 Tested in Windows 10 c++17.
 
