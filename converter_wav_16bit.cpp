@@ -33,12 +33,13 @@ static string read_write_file (const char * fname)
 	if (numChannels < 1)	return "error";
 
 	file.read (buffer, numFrames*numChannels);
-
+	
 	double ratio = (double)44100 / (double)file.samplerate();
+	int oframes = frames * ratio
 	src_data.data_in = buffer;
 	src_data.input_frames = frames;
 	src_data.data_out = buffer_out;
-	src_data.output_frames = frames;
+	src_data.output_frames = oframes;
 	src_data.src_ratio = ratio;
 
 	//convert with libsamplerate
@@ -59,7 +60,7 @@ static string read_write_file (const char * fname)
 	fname2 = newFilename.c_str();
 	file2 = SndfileHandle (fname2, SFM_WRITE, format, channels, srate) ;
 	
-	file2.write (buffer_out, numFrames * numChannels) ; //numFrames*numChannels
+	file2.write (buffer_out, oframes * numChannels) ; //numFrames*numChannels
 	printf("converted file '%s'\n", fname2);
 	delete[] buffer_out;
 	delete[] buffer;
