@@ -1,4 +1,4 @@
-//converts any .wav file or all files in cuurent folder to 16bit 44100 MHZ
+//converts any .wav file or all files in folder to 16bit 44100 MHZ wave file
 //uses libsndfile and libsamplerate libraries: https://github.com/libsndfile
 //
 #include "converter.cpp"
