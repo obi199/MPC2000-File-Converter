@@ -30,6 +30,8 @@ int main(int argc, char *argv[])
 		{
 			if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
 			{
+				try
+				{
 				filename = dir_entry.path().filename().string();
 				const char* fname = filename.c_str();
 				string cWav = read_write_wav(fname);
@@ -37,6 +39,12 @@ int main(int argc, char *argv[])
 				string fname2 = wav2snd(newWavFile);
 				if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
 				std::filesystem::remove(cWav);
+				}
+				catch (...)
+				{
+					cerr << "unexpected error with " << filename << "\n";
+				}
+				
 			}
 		}
 	}
@@ -54,5 +62,11 @@ int main(int argc, char *argv[])
 		}
 	return 0;
 } 
+
+extern "C" void __cdecl abort(void)
+{
+	volatile int a = 0;
+	a = 1 / a;
+}
 
 
