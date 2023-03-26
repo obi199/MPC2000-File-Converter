@@ -1,15 +1,15 @@
-//converts any .wav file or all files in cuurent folder to 16bit 44100 MHZ
+//converts any .wav file or all files in cuurent folder to 16bit 44100 MHZ SND Files
+// use -f argument for all file in folder
 //uses libsndfile and libsamplerate libraries: https://github.com/libsndfile
 //
+
 #include "converter.cpp"
 #include <iostream>
-#include <iomanip>
 #include <cstdio>
 #include <cstring>
 #include <filesystem>
 
 using namespace std;
-
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	
 	if (argv[1] == std::string("-f"))
 	{	
-		string newpath = "16bit";
+		string newpath = "SND";
 		std::filesystem::path p = std::filesystem::current_path();
 		std::filesystem::create_directories(newpath);
 		for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
@@ -32,8 +32,11 @@ int main(int argc, char *argv[])
 			{
 				filename = dir_entry.path().filename().string();
 				const char* fname = filename.c_str();
-				string fname2 = read_write_wav(fname);
-				if(fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+				string cWav = read_write_wav(fname);
+				const char* newWavFile = cWav.c_str();
+				string fname2 = wav2snd(newWavFile);
+				if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+				std::filesystem::remove(cWav);
 			}
 		}
 	}
@@ -41,7 +44,12 @@ int main(int argc, char *argv[])
 		{
 		const char* fname = argv[1];
 		auto const& dir_entry = std::filesystem::directory_entry{ fname };
-		if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) read_write_wav(fname);
+		if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) {
+			string aFilename = read_write_wav(fname);
+			const char*  newWavFile = aFilename.c_str();
+			wav2snd(newWavFile);
+
+		}
 		else std::cout << "\nError: File not existing or not a wave file\n";
 		}
 	return 0;

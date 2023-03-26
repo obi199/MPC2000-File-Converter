@@ -9,9 +9,12 @@
 *.user
 *.userosscache
 *.sln.docstates
-
+##cmake
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+sndfile*
+samplerate*
+/files
 
 # Mono auto generated files
 mono_crash.*
