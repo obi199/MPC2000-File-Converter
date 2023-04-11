@@ -299,7 +299,8 @@ static string read_write_wav(const char* fname)
     printf("Opened file '%s'\n", fname);
     printf("    Sample rate : %d\n", file.samplerate());
     printf("    Channels    : %d\n", file.channels());
-    //std::cout<< " frames " <<(int)file.frames() << endl;
+    printf("    Format    : %d\n", file.format());
+
     int numFrames = file.frames();
     int numChannels = file.channels();
     int numByte = file.frames();
