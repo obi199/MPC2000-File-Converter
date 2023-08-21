@@ -1,10 +1,10 @@
 //converts 16 Bit SND 44100hz to 16bit WAV File Format
 
-#include "include/sndfile.hh"
-#include "include/samplerate.h"
-#include "include/wav.h"
-#include "include/snd.h"
-#include "byte_utils.cpp"
+#include "sndfile.hh"
+#include "samplerate.h"
+#include "wav.h"
+#include "snd.h"
+#include "byte_utils.h"
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -16,6 +16,7 @@
 #include <filesystem>
 
 using namespace std;
+
 FILE    *infile, *outfile;
 char    *buffer;
 long    numbytes;
@@ -344,4 +345,94 @@ static string read_write_wav(const char* fname)
     delete[] buffer;
 
     return fname2;
+}
+
+//converts 16 Bit wav 44100hz to SND
+
+int convert16Bitwav2snd(string files2convert)
+{
+    //open wav file and read headerWAV
+    //cout << "Copyright (C) 2022 obi199" << endl;
+
+
+    if (files2convert == "-all")
+    {
+        string newpath = "snd";
+        string filename;
+
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
+            {
+                filename = dir_entry.path().filename().string();
+                const char* fname = filename.c_str();
+                string fname2 = wav2snd(fname);
+                if (fname2 != "Error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+            }
+        }
+    }
+
+    else
+    {
+        const char* fname = files2convert.c_str();
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) wav2snd(fname);
+        else std::cout << "\nError: File not existing or not a wave file\n";
+    }
+    return 0;
+}
+
+int convert_any_wav2snd(string files2convert)
+{
+    string filename;
+
+
+    if (files2convert == "-all")
+    {
+        string newpath = "SND";
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
+            {
+                try
+                {
+                    filename = dir_entry.path().filename().string();
+                    const char* fname = filename.c_str();
+                    static string cWav = read_write_wav(fname);
+                    const char* newWavFile = cWav.c_str();
+                    string fname2 = wav2snd(newWavFile);
+                    if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+                    std::filesystem::remove(cWav);
+                }
+                catch (...)
+                {
+                    cerr << "unexpected error with " << filename << "\n";
+                }
+
+            }
+        }
+    }
+    else
+    {
+        const char* fname = files2convert.c_str();
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) {
+            string aFilename = read_write_wav(fname);
+            const char* newWavFile = aFilename.c_str();
+            wav2snd(newWavFile);
+
+        }
+        else std::cout << "\nError: File not existing or not a wave file\n";
+    }
+    return 0;
+}
+
+extern "C" void __cdecl abort(void)
+{
+    volatile int a = 0;
+    a = 1 / a;
 }
