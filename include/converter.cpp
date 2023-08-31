@@ -351,14 +351,13 @@ static string read_write_wav(const char* fname)
 
 int convert16Bitwav2snd(string files2convert)
 {
-    //open wav file and read headerWAV
-    //cout << "Copyright (C) 2022 obi199" << endl;
-
+    int count = 0;
 
     if (files2convert == "-all")
     {
         string newpath = "snd";
         string filename;
+       
 
         std::filesystem::path p = std::filesystem::current_path();
         std::filesystem::create_directories(newpath);
@@ -370,6 +369,7 @@ int convert16Bitwav2snd(string files2convert)
                 const char* fname = filename.c_str();
                 string fname2 = wav2snd(fname);
                 if (fname2 != "Error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+                count = count + 1;
             }
         }
     }
@@ -378,10 +378,16 @@ int convert16Bitwav2snd(string files2convert)
     {
         const char* fname = files2convert.c_str();
         auto const& dir_entry = std::filesystem::directory_entry{ fname };
-        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) wav2snd(fname);
-        else std::cout << "\nError: File not existing or not a wave file\n";
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
+        { 
+            wav2snd(fname);
+            count = count + 1;
+        }
+       
+        else std::cout << "Error: File not existing or not a wave file\n";
+       
     }
-    return 0;
+    return count;
 }
 
 int convert_any_wav2snd(string files2convert)
