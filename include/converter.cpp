@@ -1,5 +1,6 @@
 //converts 16 Bit SND 44100hz to 16bit WAV File Format
 
+#include "converter.h"
 #include "sndfile.hh"
 #include "samplerate.h"
 #include "wav.h"
@@ -394,7 +395,6 @@ int convert_any_wav2snd(string files2convert)
 {
     string filename;
 
-
     if (files2convert == "-all")
     {
         string newpath = "SND";
@@ -441,4 +441,39 @@ extern "C" void __cdecl abort(void)
 {
     volatile int a = 0;
     a = 1 / a;
+}
+
+int convertwav16bit(string files2convert)
+{
+    string filename;
+    int count = 0;
+
+    if (files2convert == "-all")
+    {
+        string newpath = "16bit";
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav"))
+            {
+                filename = dir_entry.path().filename().string();
+                const char* fname = filename.c_str();
+                string fname2 = read_write_wav(fname);
+                if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+                count = count + 1;
+            }
+        }
+    }
+    else
+    {
+        const char* fname = files2convert.c_str();
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".wav")) {
+            read_write_wav(fname);
+            count = count + 1;
+        }
+        else std::cout << "\nError: File not existing or not a wave file\n";
+    }
+    return count;
 }
