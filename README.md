@@ -1,7 +1,7 @@
 # MPC2000-File-Converter
 
 Command Line Tool that converts any wave file (Mono/Stereo) to SND (MPC 2000) file. <br/>
-To convert wave files to 16bit 44100hz wave use "mpc2000converter" with arguments 
+To convert wave files to 16bit 44100hz wave use "mpc2000converter" with arguments: <br/>
 16bitwav2snd (convert 16bit wav to 16bit 44khz snd)<br/>
 anywav2snd (convert any wav to 16bit 44khz snd)<br/>
 wav16bit (convert wav to 16bit 44khz wav)<br/>
