@@ -315,6 +315,10 @@ static string read_write_wav(const char* fname)
     file.read(buffer, numFrames * numChannels);
 
     double ratio = (double)44100 / (double)file.samplerate();
+    if (ratio > 1) {
+        std::cerr << "Ratio greater 1 Error"<< endl;
+        return "error";
+    }
     int oframes = frames * ratio;
     src_data.data_in = buffer;
     src_data.input_frames = frames;
