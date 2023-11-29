@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 
     if (argc != 3)
     {
-        cerr << "Run in folder with files! \nError: no parameters declared. Here is the command list: \n16bitwav2snd (filename) or (-all)\nanywav2snd (filename) or (-all)\nwav16bit" << endl;
+        cerr << "Run in folder with files! \nError: no parameters declared. Here is the command list: \n16bitwav2snd (filename) or (-all)\nanywav2snd (filename) or (-all)\nwav16bit\nConvertSnd2Wav (filename) or (-all)" << endl;
         return 1;
     }
     string param = std::string(argv[1]);
@@ -36,9 +36,13 @@ int main(int argc, char* argv[])
     {
         numFiles = convertwav16bit(nfile);
     }
+    else if (param == "snd2wav")
+    {
+        numFiles = ConvertSnd2Wav(nfile);
+    }
     else
     {
-        std::cout << "Error: Run in folder with files! Commands: \n16bitwav2snd (filename) or (-all)\nanywav2snd (filename) or (-all)\n";
+        std::cout << "Error: Run in folder with files! Commands: \n16bitwav2snd (filename) or (-all)\nanywav2snd (filename) or (-all)\nConvertSnd2Wav (filename) or (-all)";
     }
     cout << numFiles << " Files converted" << endl;
 

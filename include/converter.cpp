@@ -481,3 +481,42 @@ int convertwav16bit(string files2convert)
     }
     return count;
 }
+
+int ConvertSnd2Wav(string files2convert)
+{
+    int count = 0;
+
+    if (files2convert == "-all")
+    {
+        string newpath = "wav";
+        string filename;
+
+
+        std::filesystem::path p = std::filesystem::current_path();
+        std::filesystem::create_directories(newpath);
+        for (auto const& dir_entry : std::filesystem::directory_iterator{ p })
+        {
+            if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".SND"))
+            {
+                filename = dir_entry.path().filename().string();
+                const char* fname = filename.c_str();
+                string fname2 = snd2wav(fname);
+                if (fname2 != "Error") std::filesystem::rename(p / fname2, p / newpath / fname2);
+                count = count + 1;
+            }
+        }
+    }
+
+    else
+    {
+        const char* fname = files2convert.c_str();
+        auto const& dir_entry = std::filesystem::directory_entry{ fname };
+        if (dir_entry.is_regular_file() && dir_entry.path().extension() == std::string(".SND"))
+        {
+            snd2wav(fname);
+            count = count + 1;
+        }
+        else std::cout << "Error: File not existing or not a SND file\n";
+    }
+    return count;
+}
