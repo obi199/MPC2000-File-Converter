@@ -441,11 +441,6 @@ int convert_any_wav2snd(string files2convert)
     return 0;
 }
 
-extern "C" void __cdecl abort(void)
-{
-    volatile int a = 0;
-    a = 1 / a;
-}
 
 int convertwav16bit(string files2convert)
 {
