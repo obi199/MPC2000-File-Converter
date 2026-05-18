@@ -1,3 +1,6 @@
+#ifndef WAV_H
+#define WAV_H
+
 // WAVE file header format
 
 #include <string>
@@ -22,4 +25,6 @@ struct HEADER_WAV {
 	char ckID3[4];		                        // DATA string 
 	u_int32_t cksize3;						// NumSamples * NumChannels * ByteSample
 };
+
+#endif // WAV_H
 

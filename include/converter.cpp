@@ -24,9 +24,9 @@ long    numbytes;
 struct HEADER_WAV headerWAV;
 struct HEADER_SND headerSND;
 
-static string snd2wav(const char* fname)
+string snd2wav(const char* fname)
 {
-FILE* infile = fopen(fname, "r");
+FILE* infile = fopen(fname, "rb");
 /* quit if the file does not exist */
 if(infile == NULL)
     return "Error";
@@ -49,10 +49,10 @@ if (!sndFile.is_open())
 sndFile.read(buf, bufSize);
 sndFile.close();
 //###create header###
-strcpy(headerWAV.ckID,"RIFF");
+memcpy(headerWAV.ckID,"RIFF",4);
 headerWAV.cksize = size;
-strcpy(headerWAV.WAVEID,"WAVE");
-strcpy(headerWAV.ckID2,"fmt ");
+memcpy(headerWAV.WAVEID,"WAVE",4);
+memcpy(headerWAV.ckID2,"fmt ",4);
 headerWAV.cksize2 = 16;
 headerWAV.wFormatTag = 1;
 headerWAV.nChannels = buf[21]+1;
@@ -60,7 +60,7 @@ headerWAV.nSamplesPerSec = bytes2unsignedShort(buf[40],buf[41]);
 headerWAV.nAvgBytesPerSec = headerWAV.nSamplesPerSec*2*headerWAV.nChannels ;
 headerWAV.wBitsPerSample = 16;
 headerWAV.nBlockAlign = headerWAV.wBitsPerSample*headerWAV.nChannels / 8;
-strcpy(headerWAV.ckID3,"data");
+memcpy(headerWAV.ckID3,"data",4);
 int num_samples = (size - 42) / headerWAV.nBlockAlign;
 headerWAV.cksize3 = 2 * headerWAV.nChannels * num_samples;
 
@@ -69,12 +69,21 @@ vector <short> ldata;
 vector <short> rdata;
 for (int i = 42; i < size; i+=2) // i+=2
 	{
-	uint16_t smpl1 = bytes2Short(buf[i], buf[i+1]);
-    ldata.push_back(smpl1);
     if (headerWAV.nChannels==2)
         {
-        uint16_t smpl2 = bytes2Short(buf[i], buf[i+1]);
-        rdata.push_back(smpl2);
+        int sampleIndex = (i - 42) / 2;
+        if (sampleIndex % 2 == 0) {
+            uint16_t smpl1 = bytes2Short(buf[i], buf[i+1]);
+            ldata.push_back(smpl1);
+        } else {
+            uint16_t smpl2 = bytes2Short(buf[i], buf[i+1]);
+            rdata.push_back(smpl2);
+        }
+        }
+    else
+        {
+        uint16_t smpl1 = bytes2Short(buf[i], buf[i+1]);
+        ldata.push_back(smpl1);
         }
     }
 //create wav file with same name
@@ -92,7 +101,10 @@ const char* ofileNameSND = filename.c_str();
 //write to file
 FILE* outfile = fopen(ofileNameSND, "wb");
 if (outfile == NULL)
+    {
+    delete[] buf;
     return "Error";
+    }
 fseek(outfile, 0, SEEK_SET);
 fwrite(&headerWAV.ckID,sizeof(headerWAV.ckID),1,outfile);
 fwrite(&headerWAV.cksize,sizeof(headerWAV.cksize),1,outfile);
@@ -108,25 +120,26 @@ fwrite(&headerWAV.wBitsPerSample,sizeof(headerWAV.wBitsPerSample),1,outfile);
 fwrite(&headerWAV.ckID3,sizeof(headerWAV.ckID3),1,outfile);
 fwrite(&headerWAV.cksize3,sizeof(headerWAV.cksize3),1,outfile);
 
-//if mono..
-int length = ldata.size();
-//if stereo..
-if (headerWAV.nChannels == 2) length /= 2;
-
 //write Data to File
-int j = 0;
-for (int i = 0; i < length; i++)
+int length = ldata.size();
+if (headerWAV.nChannels == 1)
     {
-     short &samplebuffer = ldata[i];
-     fwrite(&samplebuffer,sizeof(samplebuffer),1,outfile); 
-
-    if (headerWAV.nChannels == 2)
-         {
-         short& samplebuffer2 = rdata[j + ldata.size()/2];
-         fwrite(&samplebuffer2, sizeof(samplebuffer2), 1, outfile);
-         j++;
-         }
-     }
+    for (int i = 0; i < length; i++)
+        {
+        short &samplebuffer = ldata[i];
+        fwrite(&samplebuffer,sizeof(samplebuffer),1,outfile);
+        }
+    }
+else
+    {
+    for (int i = 0; i < length; i++)
+        {
+        short &samplebuffer = ldata[i];
+        fwrite(&samplebuffer,sizeof(samplebuffer),1,outfile);
+        short &samplebuffer2 = rdata[i];
+        fwrite(&samplebuffer2,sizeof(samplebuffer2),1,outfile);
+        }
+    }
 
 fclose(outfile);
 delete[] buf;
@@ -135,10 +148,10 @@ return filename;
 }
 
 
-static string wav2snd(const char* fname)
+string wav2snd(const char* fname)
 {
 
-    FILE* infile = fopen(fname, "r");
+    FILE* infile = fopen(fname, "rb");
     /* quit if the file does not exist */
     if (infile == NULL)
         return "Error";
@@ -191,12 +204,21 @@ static string wav2snd(const char* fname)
     vector <short> rdata;
     for (int i = 44; i < size; i += 2) // i+=2
     {
-        uint16_t smpl = bytes2Short(buf[i], buf[i + 1]);
-        ldata.push_back(smpl);
         if (headerWAV.nChannels == 2)
         {
-            uint16_t smpl2 = bytes2Short(buf[i], buf[i + 1]);
-            rdata.push_back(smpl2);
+            int sampleIndex = (i - 44) / 2;
+            if (sampleIndex % 2 == 0) {
+                uint16_t smpl = bytes2Short(buf[i], buf[i + 1]);
+                ldata.push_back(smpl);
+            } else {
+                uint16_t smpl2 = bytes2Short(buf[i], buf[i + 1]);
+                rdata.push_back(smpl2);
+            }
+        }
+        else
+        {
+            uint16_t smpl = bytes2Short(buf[i], buf[i + 1]);
+            ldata.push_back(smpl);
         }
     }
 
@@ -225,7 +247,8 @@ static string wav2snd(const char* fname)
     //create SND Header
     headerSND.chk1 = 1;
     headerSND.chk2 = 4;
-    strcpy(headerSND.name, sfilename);
+    memset(headerSND.name, ' ', sizeof(headerSND.name));
+    strncpy(headerSND.name, sfilename, sizeof(headerSND.name));
     headerSND.pad = ' ';
     headerSND.level = 100;
     headerSND.tune = 0;
@@ -243,7 +266,10 @@ static string wav2snd(const char* fname)
     const char* ofileNameSND = filename.c_str();
     FILE* outfile = fopen(ofileNameSND, "wb");
     if (outfile == NULL)
+    {
+        delete[] buf;
         return "Error";
+    }
     fseek(outfile, 0, SEEK_SET);
     fwrite(&headerSND.chk1, sizeof(headerSND.chk1), 1, outfile);
     fwrite(&headerSND.chk2, sizeof(headerSND.chk2), 1, outfile);
@@ -270,14 +296,13 @@ static string wav2snd(const char* fname)
             fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
         }
     }
-    //if stereo..
+    //if stereo.. write all left then all right
     if (headerWAV.nChannels == 2) {
-        for (int i = 0; i < length; i += 2) {
+        for (int i = 0; i < (int)ldata.size(); i++) {
             short& samplebuffer = ldata[i];
             fwrite(&samplebuffer, sizeof(samplebuffer), 1, outfile);
         }
-
-        for (int i = 1; i < length; i += 2) {
+        for (int i = 0; i < (int)rdata.size(); i++) {
             short& samplebuffer2 = rdata[i];
             fwrite(&samplebuffer2, sizeof(samplebuffer2), 1, outfile);
         }
@@ -291,7 +316,7 @@ static string wav2snd(const char* fname)
 }
 
 
-static string read_write_wav(const char* fname)
+string read_write_wav(const char* fname)
 {
     SndfileHandle file, file2;
     SRC_DATA src_data;
@@ -315,13 +340,16 @@ static string read_write_wav(const char* fname)
     file.read(buffer, numFrames * numChannels);
 
     double ratio = (double)44100 / (double)file.samplerate();
-    if (ratio > 1) {
-        std::cerr << "Ratio greater 1 Error"<< endl;
-        return "error";
+    if (ratio == 1.0) {
+        // already at 44100, skip resampling but still write 16-bit
     }
-    int oframes = frames * ratio;
+    int oframes = (int)(numFrames * ratio);
+    int totalOutSamples = oframes * numChannels;
+    float* buffer_out_resized = new float[totalOutSamples];
+    delete[] buffer_out;
+    buffer_out = buffer_out_resized;
     src_data.data_in = buffer;
-    src_data.input_frames = frames;
+    src_data.input_frames = numFrames;
     src_data.data_out = buffer_out;
     src_data.output_frames = oframes;
     src_data.src_ratio = ratio;
@@ -344,7 +372,7 @@ static string read_write_wav(const char* fname)
     fname2 = newFilename.c_str();
     file2 = SndfileHandle(fname2, SFM_WRITE, format, channels, srate);
 
-    file2.write(buffer_out, oframes * numChannels); //numFrames*numChannels
+    file2.write(buffer_out, totalOutSamples); //numFrames*numChannels
     //printf("converted file '%s'\n", fname2);
     delete[] buffer_out;
     delete[] buffer;
@@ -398,6 +426,7 @@ int convert16Bitwav2snd(string files2convert)
 int convert_any_wav2snd(string files2convert)
 {
     string filename;
+    int count = 0;
 
     if (files2convert == "-all")
     {
@@ -412,11 +441,12 @@ int convert_any_wav2snd(string files2convert)
                 {
                     filename = dir_entry.path().filename().string();
                     const char* fname = filename.c_str();
-                    static string cWav = read_write_wav(fname);
+                    string cWav = read_write_wav(fname);
                     const char* newWavFile = cWav.c_str();
                     string fname2 = wav2snd(newWavFile);
                     if (fname2 != "error") std::filesystem::rename(p / fname2, p / newpath / fname2);
                     std::filesystem::remove(cWav);
+                    count++;
                 }
                 catch (...)
                 {
@@ -434,11 +464,12 @@ int convert_any_wav2snd(string files2convert)
             string aFilename = read_write_wav(fname);
             const char* newWavFile = aFilename.c_str();
             wav2snd(newWavFile);
+            count++;
 
         }
         else std::cout << "\nError: File not existing or not a wave file\n";
     }
-    return 0;
+    return count;
 }
 
 

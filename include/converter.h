@@ -1,3 +1,6 @@
+#ifndef CONVERTER_H
+#define CONVERTER_H
+
 #include <string>
 #include <cstring>
 
@@ -10,3 +13,5 @@ string wav2snd(const char*);
 string read_write_wav(const char*);
 int convertwav16bit(string);
 int ConvertSnd2Wav(string);
+
+#endif // CONVERTER_H

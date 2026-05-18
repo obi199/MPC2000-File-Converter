@@ -5,7 +5,7 @@ using namespace std;
 typedef uint32_t u_int32_t;
 typedef uint16_t u_int16_t;
 
-unsigned long bytes2Long(char byte1, char byte2, char byte3, char byte4)
+unsigned long bytes2Long(unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4)
 {
 	unsigned int combined = 0; // clear it out
 	combined = (byte4<<24) | (byte3<<16) | (byte2<<8) | (byte1);
@@ -13,7 +13,7 @@ unsigned long bytes2Long(char byte1, char byte2, char byte3, char byte4)
 	
 }
 
-unsigned short bytes2unsignedShort(char byte1, char byte2)
+unsigned short bytes2unsignedShort(unsigned char byte1, unsigned char byte2)
 {
 	unsigned short combined = 0;
 	combined = (byte2 << 8) | (byte1) ;
@@ -21,7 +21,7 @@ unsigned short bytes2unsignedShort(char byte1, char byte2)
 	
 }
 
-u_int32_t bytes_2_u_int32(char byte1, char byte2, char byte3, char byte4)
+u_int32_t bytes_2_u_int32(unsigned char byte1, unsigned char byte2, unsigned char byte3, unsigned char byte4)
 {
 	u_int32_t combined = 0; // clear it out
 	combined = (byte4<<24) | (byte3<<16)  | ((byte2<<8) &  0xff00) | (byte1 & 0xff );
@@ -49,7 +49,7 @@ u_int32_t bytes_2_u_int32(char byte1, char byte2, char byte3, char byte4)
 // 	return res;
 // }
 
-u_int16_t bytes2Short(char byte1, char byte2)
+u_int16_t bytes2Short(unsigned char byte1, unsigned char byte2)
 {
 	 u_int16_t combined = 0;
 	 combined = (byte1 & 0xff | ((int)byte2 << 8) & 0xff00 );

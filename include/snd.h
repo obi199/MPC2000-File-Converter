@@ -1,3 +1,6 @@
+#ifndef SND_H
+#define SND_H
+
 // SND file header format
 
 #include <string>
@@ -39,3 +42,5 @@ struct HEADER_SND {
 //       1     unsigned char       Loop Mode: 0=Off 1=On
 //       1     unsigned char       Beats in loop 1...16 (default 1)
 //       2     unsigned short      Sampling frequency (default 44100)
+
+#endif // SND_H
